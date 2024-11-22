@@ -1,5 +1,7 @@
 package itis.shuvalova.servlet;
 
+import itis.shuvalova.dao.impl.UserDaoImpl;
+import itis.shuvalova.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -16,16 +18,13 @@ public class AuthorisationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String login = req.getParameter("login");
         String password = req.getParameter("password");
-        if ("login".equalsIgnoreCase(login) && "password".equals(password)){
-            // session
+
+        User user = new UserDaoImpl().getByLogin(login);
+        if (user!=null && user.getPassword().equals(password)) {
             HttpSession httpSession = req.getSession();
             httpSession.setAttribute("user", login);
             httpSession.setMaxInactiveInterval(60 * 60);
-            // cookie
-            Cookie cookie = new Cookie("user", login);
-            cookie.setMaxAge(24 * 60 * 60);
-            resp.addCookie(cookie);
-            resp.sendRedirect("main.html");
+            resp.sendRedirect("main.jsp");
         } else {
             resp.sendRedirect("/index");
         }

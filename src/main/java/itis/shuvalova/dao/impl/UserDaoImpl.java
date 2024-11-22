@@ -3,6 +3,7 @@ package itis.shuvalova.dao.impl;
 import itis.shuvalova.dao.UserDao;
 import itis.shuvalova.entity.User;
 import itis.shuvalova.util.DatabaseConnectionUtil;
+import itis.shuvalova.util.PasswordUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User getByLogin(String login) {
         try {
-            String sql = "select * from users where login = ?";
+            String sql = "select * from sam_users where login = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
@@ -45,7 +46,7 @@ public class UserDaoImpl implements UserDao {
     public List<User> getAll() {
         try {
             Statement statement = connection.createStatement();
-            String sql = "select * from users";
+            String sql = "select * from sam_users";
             ResultSet resultSet = statement.executeQuery(sql);
             List<User> users = new ArrayList<>();
             if (resultSet != null) {
@@ -69,13 +70,13 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void save(User user) {
-        String sql = "insert into users (name, lastname, login , password) values (?, ?, ?, ?)";
+        String sql = "insert into sam_users (name, lastname, login , password) values (?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getLastName());
             preparedStatement.setString(3, user.getLogin());
-            preparedStatement.setString(4, user.getPassword());
+            preparedStatement.setString(4, PasswordUtil.encrypt(user.getPassword()));
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
